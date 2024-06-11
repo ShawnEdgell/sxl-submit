@@ -38,7 +38,7 @@
 	<svelte:fragment slot="header">
 		<AppBar />
 	</svelte:fragment>
-	<div class="flex justify-center items-center h-full">
+	<div class="flex justify-center items-center h-full py-6">
 		<slot />
 	</div>
 </AppShell>
