@@ -14,16 +14,11 @@
 	}
 </script>
 
-<AppBar
-	padding="px-4 py-2"
-	gridColumns="grid-cols-3"
-	slotDefault="place-self-center"
-	slotTrail="place-content-end"
->
+<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
 	<svelte:fragment slot="lead">
-		<button on:click={openDrawer}>
+		<button on:click={openDrawer} class="h-10 w-10 cursor-pointer" aria-label="Open drawer">
 			<svg
-				class="h-10 w-10 cursor-pointer"
+				class="h-full w-full"
 				fill="currentColor"
 				viewBox="0 0 32 32"
 				xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +33,7 @@
 			</svg>
 		</button>
 	</svelte:fragment>
-	<a href="/" class="btn text-2xl btn-lg italic font-bold">XLSubmit.</a>
+	<a href="/" class="text-2xl btn-lg italic font-bold">XLSubmit.</a>
 	<svelte:fragment slot="trail">
 		<LightSwitch />
 	</svelte:fragment>
