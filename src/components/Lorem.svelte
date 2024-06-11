@@ -1,4 +1,4 @@
-<article class="prose dark:prose-dark lg:prose-xl my-6 p-6">
+<div class="mt-12">
 	<h1 class="h1">Header</h1>
 	<p>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vitae gravida tellus. Duis tempus
@@ -42,4 +42,4 @@
 		eu sollicitudin lorem ligula et diam. Duis feugiat posuere tempor. Quisque nec pellentesque
 		ipsum, eu commodo magna. Suspendisse consectetur ex neque, at finibus nulla feugiat nec.
 	</p>
-</article>
+</div>

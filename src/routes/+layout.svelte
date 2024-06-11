@@ -1,8 +1,12 @@
 <script lang="ts">
 	import '../app.postcss';
-	import { initializeStores, AppShell } from '@skeletonlabs/skeleton';
+	import { AppShell, initializeStores, Drawer } from '@skeletonlabs/skeleton';
 
 	initializeStores();
+
+	// Components
+	import AppBar from '../components/AppBar.svelte';
+	import Navigation from '../components/Navigation.svelte';
 
 	// Highlight JS
 	import hljs from 'highlight.js/lib/core';
@@ -23,26 +27,18 @@
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
-
-	// Components
-	import AppBar from '$lib/components/AppBar.svelte';
-
-	// Scroll to Top on Navigation
-	import type { AfterNavigate } from '@sveltejs/kit';
-	import { afterNavigate } from '$app/navigation';
-
-	afterNavigate((params: AfterNavigate) => {
-		const isNewPage = params.from?.url.pathname !== params.to?.url.pathname;
-		const elemPage = document.querySelector('#page');
-		if (isNewPage && elemPage !== null) {
-			elemPage.scrollTop = 0;
-		}
-	});
 </script>
 
+<Drawer>
+	<Navigation />
+</Drawer>
+
+<!-- App Shell -->
 <AppShell>
 	<svelte:fragment slot="header">
 		<AppBar />
 	</svelte:fragment>
-	<slot />
+	<div class="flex justify-center items-center h-full">
+		<slot />
+	</div>
 </AppShell>
