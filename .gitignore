@@ -1,10 +1,21 @@
+# macOS
 .DS_Store
+
+# Node.js
 node_modules
+
+# Build output
 /build
 /.svelte-kit
 /package
+
+# Environment variables
 .env
 .env.*
+
+# Include example environment variable file
 !.env.example
+
+# Vite config timestamps
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

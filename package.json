@@ -44,6 +44,7 @@
 	"type": "module",
 	"dependencies": {
 		"@floating-ui/dom": "1.6.5",
+		"@sveltejs/adapter-static": "^3.0.1",
 		"date-fns": "^3.6.0",
 		"dotenv": "^16.4.5",
 		"firebase": "^10.12.2",
