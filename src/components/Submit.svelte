@@ -1,15 +1,13 @@
 <script lang="ts">
 	import { auth, addVideoEntry } from '../firebase';
-	import type { User } from 'firebase/auth'; // Import User type from firebase/auth
+	import type { User } from 'firebase/auth';
 	import type { VideoEntry } from '../firebase';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 
-	// Store to manage the authentication state
 	const user = writable<User | null>(null);
 	const errorMessage = writable('');
 
-	// Check the authentication state on component mount
 	onMount(() => {
 		const unsubscribe = auth.onAuthStateChanged((authUser) => {
 			if (authUser) {
@@ -42,7 +40,7 @@
 
 		const currentUser = $user;
 		if (currentUser) {
-			const entry: VideoEntry = {
+			const entry: Omit<VideoEntry, 'id'> = {
 				url: videoUrl,
 				title: `Video by ${currentUser.displayName || 'Anonymous'}`,
 				author: currentUser.displayName || 'Anonymous',
