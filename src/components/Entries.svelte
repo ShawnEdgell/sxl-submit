@@ -67,59 +67,17 @@
 			return entries.map((e) => (e.id === entry.id ? { ...entry } : e));
 		});
 	}
-
-	function intersectionObserver(node: HTMLElement, loadVideo: () => void) {
-		let observer: IntersectionObserver;
-
-		function handleIntersect(entries: IntersectionObserverEntry[]) {
-			entries.forEach((entry) => {
-				if (entry.isIntersecting) {
-					loadVideo();
-					observer.disconnect();
-				}
-			});
-		}
-
-		observer = new IntersectionObserver(handleIntersect, {
-			root: null,
-			rootMargin: '0px',
-			threshold: 0.1
-		});
-
-		if (node) {
-			observer.observe(node);
-		}
-
-		return {
-			destroy() {
-				if (observer && node) {
-					observer.unobserve(node);
-				}
-			}
-		};
-	}
-
-	function loadVideo(entry: VideoEntry) {
-		const iframe = document.querySelector(`iframe[data-id="${entry.id}"]`) as HTMLIFrameElement;
-		if (iframe) {
-			iframe.src = getYouTubeEmbedUrl(entry.url) ?? '';
-		}
-	}
 </script>
 
 <h2>This Week's Entries</h2>
 
 {#each $entries as entry}
 	<div class="card mb-8 shadow-xl">
-		<div
-			class="relative overflow-hidden rounded-2xl"
-			style="padding-top: 56.25%;"
-			use:intersectionObserver={() => loadVideo(entry)}
-		>
+		<div class="relative overflow-hidden rounded-2xl" style="padding-top: 56.25%;">
 			<iframe
-				data-id={entry.id}
 				title="video submission"
 				class="absolute top-0 left-0 w-full h-full"
+				src={getYouTubeEmbedUrl(entry.url)}
 				loading="lazy"
 				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 				allowfullscreen
