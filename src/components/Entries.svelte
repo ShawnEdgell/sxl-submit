@@ -40,14 +40,32 @@
 
 	async function toggleLike(entry: VideoEntry) {
 		if (!currentUser) return;
-		if (entry.hasLiked) {
+
+		// Optimistically update the UI
+		const wasLiked = entry.hasLiked;
+		entry.hasLiked = !entry.hasLiked;
+		entry.likes = entry.likes || 0;
+		entry.likes += entry.hasLiked ? 1 : -1;
+
+		// Update the store to trigger reactivity
+		entries.update((entries) => {
+			return entries.map((e) => (e.id === entry.id ? { ...entry } : e));
+		});
+
+		// Perform the actual like/unlike operation
+		if (wasLiked) {
 			await unlikePost(entry.id, currentUser.uid);
 		} else {
 			await likePost(entry.id, currentUser.uid);
 		}
-		// Update the entry's like status and count
-		entry.hasLiked = !entry.hasLiked;
+
+		// Ensure the likes count is updated correctly after the operation
 		entry.likes = (await getLikesCount(entry.id)) || 0;
+
+		// Update the store again to ensure the correct likes count is displayed
+		entries.update((entries) => {
+			return entries.map((e) => (e.id === entry.id ? { ...entry } : e));
+		});
 	}
 </script>
 
