@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { auth, provider, signInWithPopup, signOut, addVideoEntry } from '../firebase';
+	import { auth, provider, signInWithPopup, signOut } from '../firebase';
 	import type { User } from 'firebase/auth';
-	import type { VideoEntry } from '../firebase';
 	import { onMount } from 'svelte';
+	import { user } from '../stores'; // Import user store
 	import { writable } from 'svelte/store';
 
-	// Store to manage the authentication state
-	const user = writable<User | null>(null);
+	const loading = writable(false);
+	const errorMessage = writable('');
 
 	// Check the authentication state on component mount
 	onMount(() => {
@@ -22,89 +22,65 @@
 
 	async function handleGoogleLogin() {
 		try {
+			loading.set(true);
 			const result = await signInWithPopup(auth, provider);
 			user.set(result.user);
 			console.log('User info:', result.user);
 		} catch (error) {
 			console.error('Error during sign in:', error);
+			errorMessage.set('Failed to sign in. Please try again.');
+		} finally {
+			loading.set(false);
 		}
 	}
 
 	async function handleLogout() {
 		try {
+			loading.set(true);
 			await signOut(auth);
 			user.set(null);
 			console.log('User logged out');
 		} catch (error) {
 			console.error('Error during sign out:', error);
+			errorMessage.set('Failed to sign out. Please try again.');
+		} finally {
+			loading.set(false);
 		}
-	}
-
-	function getYouTubeEmbedUrl(url: string): string | null {
-		const regex =
-			/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.+\?.*v=)|youtu\.be\/)([^"&?/\s]{11})/i;
-		const match = url.match(regex);
-		return match ? `https://www.youtube.com/embed/${match[1]}` : null;
-	}
-
-	async function handleSubmit(event: Event) {
-		event.preventDefault();
-		const form = event.target as HTMLFormElement;
-		const input = form.querySelector('input[name="video-url"]') as HTMLInputElement;
-		const videoUrl = getYouTubeEmbedUrl(input.value);
-
-		if (!videoUrl) {
-			console.error('Invalid YouTube URL');
-			return;
-		}
-
-		const currentUser = $user;
-		if (currentUser) {
-			const entry: VideoEntry = {
-				url: videoUrl,
-				title: `Video by ${currentUser.displayName || 'Anonymous'}`,
-				author: currentUser.displayName || 'Anonymous',
-				date: new Date().toISOString()
-			};
-
-			try {
-				await addVideoEntry(entry);
-				console.log('Video submitted:', entry);
-			} catch (error) {
-				console.error('Error submitting video:', error);
-			}
-		}
-
-		input.value = '';
 	}
 </script>
 
-<section class="w-full mx-auto text-center">
-	<form class="form-control" on:submit={handleSubmit}>
-		{#if $user}
-			<div class="flex flex-col items-center">
-				<p>Welcome, {$user.displayName}!</p>
-				<img
-					src={$user.photoURL}
-					alt="{$user.displayName}'s profile picture"
-					class="rounded-full w-16 h-16 mt-4 mb-4"
-				/>
-				<button type="button" class="btn variant-filled-primary" on:click={handleLogout}>
-					Logout
-				</button>
-				<h2>Submit Your Video</h2>
-				<input
-					type="text"
-					name="video-url"
-					class="input input-bordered mt-4"
-					placeholder="Enter your video URL"
-					required
-				/>
-				<button type="submit" class="btn variant-filled-primary mt-4">Submit</button>
-			</div>
-		{:else}
-			<p>You need to be logged in to post and react to posts.</p>
-			<button type="button" class="btn sm:btn-lg variant-ghost mt-4" on:click={handleGoogleLogin}>
+<section class="w-full mx-auto text-center p-2">
+	{#if $user}
+		<div class="flex flex-col items-center space-y-5">
+			<p>Welcome, {$user.displayName}!</p>
+			<img
+				src={$user.photoURL}
+				alt="{$user.displayName}'s profile picture"
+				class="rounded-full w-24 h-24"
+			/>
+			<button
+				type="button"
+				class="btn variant-filled-primary"
+				on:click={handleLogout}
+				disabled={$loading}
+			>
+				{#if $loading}Logging out...{/if}
+				{#if !$loading}Logout{/if}
+			</button>
+			{#if $errorMessage}
+				<p class="text-red-500 mt-2">{$errorMessage}</p>
+			{/if}
+		</div>
+	{:else}
+		<p class="font-bold mb-2">Login</p>
+		<button
+			type="button"
+			class="btn variant-ghost"
+			on:click={handleGoogleLogin}
+			disabled={$loading}
+		>
+			{#if $loading}Signing in...{/if}
+			{#if !$loading}
 				<span>
 					<svg
 						class="w-6 h-6 mr-2"
@@ -150,7 +126,10 @@
 					</svg>
 				</span>
 				<span>Sign in with Google</span>
-			</button>
+			{/if}
+		</button>
+		{#if $errorMessage}
+			<p class="text-red-500 mt-2">{$errorMessage}</p>
 		{/if}
-	</form>
+	{/if}
 </section>

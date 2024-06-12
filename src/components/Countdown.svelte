@@ -50,8 +50,8 @@
 	});
 </script>
 
-<div class="font-bold text-3xl md:text-6xl">
-	{#if $timeLeft}
+{#if $timeLeft}
+	<h1 class="font-bold">
 		{$timeLeft.days}d {$timeLeft.hours}h {$timeLeft.minutes}m {$timeLeft.seconds}s
-	{/if}
-</div>
+	</h1>
+{/if}

@@ -1,12 +1,31 @@
 <script lang="ts">
 	import '../app.postcss';
-	import { AppShell, initializeStores, Drawer } from '@skeletonlabs/skeleton';
+	import {
+		initializeStores,
+		Drawer,
+		getDrawerStore,
+		autoModeWatcher,
+		setInitialClassState
+	} from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
 
 	initializeStores();
+
+	// Initialize theme state on page load
+	onMount(() => {
+		setInitialClassState();
+	});
+
+	const drawerStore = getDrawerStore();
+
+	function closeDrawer() {
+		drawerStore.close();
+	}
 
 	// Components
 	import AppBar from '../components/AppBar.svelte';
 	import Navigation from '../components/Navigation.svelte';
+	import Footer from '../components/Footer.svelte';
 
 	// Highlight JS
 	import hljs from 'highlight.js/lib/core';
@@ -29,18 +48,20 @@
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 </script>
 
+<svelte:head>
+	{@html '<script>(' + autoModeWatcher.toString() + ')();</script>'}
+	{@html '<script>(' + setInitialClassState.toString() + ')();</script>'}
+</svelte:head>
+
 <Drawer>
 	<Navigation />
 </Drawer>
 
-<!-- App Shell -->
-<AppShell>
-	<svelte:fragment slot="header">
-		<AppBar />
-	</svelte:fragment>
-	<div class="flex justify-center items-center h-full py-12 px-6">
-		<div class="w-full max-w-xl prose dark:prose-dark lg:prose-xl">
-			<slot />
-		</div>
+<div class="flex flex-col min-h-screen items-center">
+	<AppBar />
+	<!-- Add LightSwitch component here -->
+	<div class="flex-1 w-full max-w-2xl prose dark:prose-dark lg:prose-xl my-4 p-4">
+		<slot />
 	</div>
-</AppShell>
+</div>
+<Footer />

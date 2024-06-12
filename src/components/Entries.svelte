@@ -27,39 +27,33 @@
 	}
 </script>
 
-<section class="w-full mx-auto">
-	<h2 class="font-bold text-center">This Week's Entries</h2>
-	<div class="space-y-4">
-		{#each $entries as entry}
-			<div class="card">
-				<header class="card-header">
-					<div class="relative overflow-hidden rounded-2xl" style="padding-top: 56.25%;">
-						<iframe
-							title="video submission"
-							class="absolute top-0 left-0 w-full h-full"
-							src={getYouTubeEmbedUrl(entry.url)}
-							loading="lazy"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowfullscreen
-						></iframe>
-					</div>
-				</header>
-				<div class="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-end">
-					<div>
-						<div class="p-0 m-0">
-							<span class="font-semibold">Author:</span>
-							{entry.author}
-						</div>
-						<div class="p-0 m-0">
-							<span class="font-semibold">Date:</span>
-							{formatDate(entry.date)}
-						</div>
-					</div>
-					<div class="self-end sm:self-auto mt-4 sm:mt-0">
-						<button class="btn variant-ghost-surface">🔥</button>
-					</div>
+<h2>This Week's Entries</h2>
+
+{#each $entries as entry}
+	<div class="card mb-8 shadow-xl">
+		<div class="relative overflow-hidden rounded-2xl" style="padding-top: 56.25%;">
+			<iframe
+				title="video submission"
+				class="absolute top-0 left-0 w-full h-full"
+				src={getYouTubeEmbedUrl(entry.url)}
+				loading="lazy"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+				allowfullscreen
+			></iframe>
+		</div>
+
+		<div class="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-end">
+			<div>
+				<div class="text-left m-0 p-0">
+					<span class="h3 font-bold m-0 p-0">{entry.title}</span>
+				</div>
+				<div class="text-left p-0 m-0">
+					{formatDate(entry.date)}
 				</div>
 			</div>
-		{/each}
+			<div class="self-end sm:self-auto mt-4 sm:mt-0">
+				<button class="btn sm:btn-lg variant-ghost-surface">🔥</button>
+			</div>
+		</div>
 	</div>
-</section>
+{/each}

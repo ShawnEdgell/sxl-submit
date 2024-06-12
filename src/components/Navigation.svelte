@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getDrawerStore } from '@skeletonlabs/skeleton';
+	import { getDrawerStore, LightSwitch } from '@skeletonlabs/skeleton';
 
 	const drawerStore = getDrawerStore();
 
@@ -8,11 +8,23 @@
 	}
 </script>
 
-<nav class="flex flex-col text-center gap-2 p-4 mt-4 justify-center">
-	<a
-		on:click={closeDrawer}
-		class="btn btn-lg variant-soft"
-		href="/"
-		data-sveltekit-preload-data="hover">Home</a
-	>
-</nav>
+<div class="flex flex-col items-center mt-4 p-4 space-y-8">
+	<div class="flex items-center gap-4">
+		<p class="text-xl font-bold">LightSwitch:</p>
+		<LightSwitch />
+	</div>
+	<nav class="w-full max-w-xs flex flex-col gap-2">
+		<a
+			on:click={closeDrawer}
+			class="btn variant-filled"
+			href="/"
+			data-sveltekit-preload-data="hover">Home</a
+		>
+		<a
+			on:click={closeDrawer}
+			class="btn variant-filled"
+			href="/archive"
+			data-sveltekit-preload-data="hover">Archive</a
+		>
+	</nav>
+</div>
