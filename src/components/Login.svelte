@@ -1,24 +1,10 @@
 <script lang="ts">
 	import { auth, provider, signInWithPopup, signOut } from '../firebase';
-	import type { User } from 'firebase/auth';
-	import { onMount } from 'svelte';
-	import { user } from '../stores'; // Import user store
+	import { user } from '../firebase';
 	import { writable } from 'svelte/store';
 
 	const loading = writable(false);
 	const errorMessage = writable('');
-
-	// Check the authentication state on component mount
-	onMount(() => {
-		const unsubscribe = auth.onAuthStateChanged((authUser) => {
-			if (authUser) {
-				user.set(authUser);
-			} else {
-				user.set(null);
-			}
-		});
-		return () => unsubscribe();
-	});
 
 	async function handleGoogleLogin() {
 		try {

@@ -43,7 +43,7 @@
 			</button>
 		</div>
 
-		<div class="flex">
+		<div class="relative flex">
 			<button class="btn p-0 m-0" use:popup={popupClick}>
 				<Avatar width="w-10" />
 			</button>

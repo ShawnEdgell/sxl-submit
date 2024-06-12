@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { user } from '../stores'; // Adjust the path if needed
-	import type { User } from 'firebase/auth';
-	import { writable } from 'svelte/store';
+	import { user } from '../firebase';
+	import { onMount } from 'svelte';
 
-	export let width: string = 'w-9';
+	export let width: string = 'w-10';
 	export let altText: string = 'User Avatar';
 	let profileImageUrl: string = '';
 
-	// Ensure profileImageUrl is always a string
-	$: user.subscribe((value) => {
-		profileImageUrl = value?.photoURL || '';
+	onMount(() => {
+		user.subscribe((value) => {
+			profileImageUrl = value?.photoURL || '';
+		});
 	});
 </script>
 

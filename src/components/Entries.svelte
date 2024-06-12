@@ -1,30 +1,15 @@
 <script lang="ts">
-	import {
-		subscribeToVideoEntries,
-		likePost,
-		unlikePost,
-		getPostLikes,
-		hasUserLikedPost
-	} from '../firebase';
+	import { subscribeToVideoEntries } from '../firebase';
 	import type { VideoEntry } from '../firebase';
 	import { onMount } from 'svelte';
-	import { writable, get } from 'svelte/store';
-	import { user } from '../stores';
+	import { writable } from 'svelte/store';
 	import { format } from 'date-fns';
 
 	const entries = writable<VideoEntry[]>([]);
 
 	onMount(() => {
-		const unsubscribe = subscribeToVideoEntries(async (videoEntries: VideoEntry[]) => {
-			const currentUser = get(user);
-			const updatedEntries = await Promise.all(
-				videoEntries.map(async (entry) => {
-					entry.likes = await getPostLikes(entry.id!);
-					entry.hasLiked = currentUser ? await hasUserLikedPost(entry.id!, currentUser.uid) : false;
-					return entry;
-				})
-			);
-			entries.set(updatedEntries);
+		const unsubscribe = subscribeToVideoEntries((videoEntries: VideoEntry[]) => {
+			entries.set(videoEntries);
 		});
 		return () => unsubscribe();
 	});
@@ -39,20 +24,6 @@
 	function formatDate(dateString: string): string {
 		const date = new Date(dateString);
 		return format(date, 'EEEE, MMMM d, yyyy');
-	}
-
-	async function handleLike(entry: VideoEntry) {
-		const currentUser = get(user);
-		if (!currentUser) return;
-
-		if (entry.hasLiked) {
-			await unlikePost(entry.id!, currentUser.uid);
-			entry.likes = (entry.likes ?? 0) - 1;
-		} else {
-			await likePost(entry.id!, currentUser.uid);
-			entry.likes = (entry.likes ?? 0) + 1;
-		}
-		entry.hasLiked = !entry.hasLiked;
 	}
 </script>
 
@@ -80,14 +51,8 @@
 					{formatDate(entry.date)}
 				</div>
 			</div>
-			<div class="self-end sm:self-auto mt-4 sm:mt-0 flex items-center space-x-2">
-				<button
-					class="btn sm:btn-lg variant-ghost-surface"
-					on:click={() => handleLike(entry)}
-					disabled={!$user}
-				>
-					🔥 {entry.likes ?? 0}
-				</button>
+			<div class="self-end sm:self-auto mt-4 sm:mt-0">
+				<button class="btn sm:btn-lg variant-ghost-surface">🔥</button>
 			</div>
 		</div>
 	</div>

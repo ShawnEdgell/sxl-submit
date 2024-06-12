@@ -5,8 +5,6 @@ import {
 	signInWithPopup,
 	signOut,
 	onAuthStateChanged,
-	setPersistence,
-	browserLocalPersistence,
 	type User
 } from 'firebase/auth';
 import {
@@ -16,10 +14,9 @@ import {
 	query,
 	onSnapshot,
 	getDocs,
-	orderBy,
-	where,
-	deleteDoc
+	orderBy
 } from 'firebase/firestore';
+import { writable } from 'svelte/store';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -40,23 +37,23 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 
-// Set session persistence
-setPersistence(auth, browserLocalPersistence)
-	.then(() => {
-		console.log('Persistence set to local');
-	})
-	.catch((error) => {
-		console.error('Error setting persistence:', error);
-	});
+// Store to manage the authentication state
+export const user = writable<User | null>(null);
+
+// Listen to authentication state changes and update the user store
+onAuthStateChanged(auth, (authUser) => {
+	if (authUser) {
+		user.set(authUser);
+	} else {
+		user.set(null);
+	}
+});
 
 export type VideoEntry = {
-	id?: string;
 	url: string;
 	title: string;
 	author: string;
 	date: string;
-	likes?: number;
-	hasLiked?: boolean;
 };
 
 const addVideoEntry = async (entry: VideoEntry) => {
@@ -70,66 +67,15 @@ const addVideoEntry = async (entry: VideoEntry) => {
 const getVideoEntries = async (): Promise<VideoEntry[]> => {
 	const q = query(collection(db, 'videoEntries'), orderBy('date', 'desc')); // Sorting by date in descending order
 	const querySnapshot = await getDocs(q);
-	return querySnapshot.docs.map((doc) => {
-		const data = doc.data() as VideoEntry;
-		data.id = doc.id;
-		return data;
-	});
+	return querySnapshot.docs.map((doc) => doc.data() as VideoEntry);
 };
 
 const subscribeToVideoEntries = (callback: (entries: VideoEntry[]) => void) => {
 	const q = query(collection(db, 'videoEntries'), orderBy('date', 'desc')); // Sorting by date in descending order
-	return onSnapshot(q, async (querySnapshot) => {
-		const entries = await Promise.all(
-			querySnapshot.docs.map(async (doc) => {
-				const data = doc.data() as VideoEntry;
-				data.id = doc.id;
-				data.likes = await getPostLikes(data.id);
-				return data;
-			})
-		);
+	return onSnapshot(q, (querySnapshot) => {
+		const entries = querySnapshot.docs.map((doc) => doc.data() as VideoEntry);
 		callback(entries);
 	});
-};
-
-const likePost = async (postId: string, userId: string) => {
-	try {
-		await addDoc(collection(db, 'likes'), { postId, userId });
-	} catch (error) {
-		console.error('Error liking post: ', error);
-	}
-};
-
-const unlikePost = async (postId: string, userId: string) => {
-	try {
-		const q = query(
-			collection(db, 'likes'),
-			where('postId', '==', postId),
-			where('userId', '==', userId)
-		);
-		const querySnapshot = await getDocs(q);
-		querySnapshot.forEach(async (doc) => {
-			await deleteDoc(doc.ref);
-		});
-	} catch (error) {
-		console.error('Error unliking post: ', error);
-	}
-};
-
-const getPostLikes = async (postId: string): Promise<number> => {
-	const q = query(collection(db, 'likes'), where('postId', '==', postId));
-	const querySnapshot = await getDocs(q);
-	return querySnapshot.size;
-};
-
-const hasUserLikedPost = async (postId: string, userId: string): Promise<boolean> => {
-	const q = query(
-		collection(db, 'likes'),
-		where('postId', '==', postId),
-		where('userId', '==', userId)
-	);
-	const querySnapshot = await getDocs(q);
-	return !querySnapshot.empty;
 };
 
 export {
@@ -139,10 +85,5 @@ export {
 	signOut,
 	addVideoEntry,
 	getVideoEntries,
-	subscribeToVideoEntries,
-	onAuthStateChanged,
-	likePost,
-	unlikePost,
-	getPostLikes,
-	hasUserLikedPost
+	subscribeToVideoEntries
 };
