@@ -15,19 +15,15 @@
 
 	const entries = writable<VideoEntry[]>([]);
 	let currentUser = get(user);
-	let pageLoaded = writable(false);
 
 	onMount(() => {
-		window.addEventListener('load', () => {
-			pageLoaded.set(true);
-			const unsubscribe = subscribeToVideoEntries(async (videoEntries: VideoEntry[]) => {
-				entries.set(videoEntries);
-			});
-			user.subscribe((value) => {
-				currentUser = value;
-			});
-			return () => unsubscribe();
+		const unsubscribe = subscribeToVideoEntries(async (videoEntries: VideoEntry[]) => {
+			entries.set(videoEntries);
 		});
+		user.subscribe((value) => {
+			currentUser = value;
+		});
+		return () => unsubscribe();
 	});
 
 	function getYouTubeEmbedUrl(url: string): string | null {
@@ -113,45 +109,41 @@
 
 <h2>This Week's Entries</h2>
 
-{#await pageLoaded}
-	<p>Loading entries...</p>
-{:then}
-	{#each $entries as entry}
-		<div class="card mb-8 shadow-xl">
-			<div
-				class="relative overflow-hidden rounded-2xl"
-				style="padding-top: 56.25%;"
-				use:intersectionObserver={() => loadVideo(entry)}
-			>
-				<iframe
-					data-id={entry.id}
-					title="video submission"
-					class="absolute top-0 left-0 w-full h-full"
-					loading="lazy"
-					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-					allowfullscreen
-				></iframe>
-			</div>
+{#each $entries as entry}
+	<div class="card mb-8 shadow-xl">
+		<div
+			class="relative overflow-hidden rounded-2xl"
+			style="padding-top: 56.25%;"
+			use:intersectionObserver={() => loadVideo(entry)}
+		>
+			<iframe
+				data-id={entry.id}
+				title="video submission"
+				class="absolute top-0 left-0 w-full h-full"
+				loading="lazy"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+				allowfullscreen
+			></iframe>
+		</div>
 
-			<div class="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-end">
-				<div>
-					<div class="text-left m-0 p-0">
-						<span class="h3 font-bold m-0 p-0">{entry.title}</span>
-					</div>
-					<div class="text-left p-0 m-0">
-						{formatDate(entry.date)}
-					</div>
+		<div class="p-6 flex flex-col sm:flex-row sm:justify-between sm:items-end">
+			<div>
+				<div class="text-left m-0 p-0">
+					<span class="h3 font-bold m-0 p-0">{entry.title}</span>
 				</div>
-				<div class="self-end sm:self-auto mt-4 sm:mt-0">
-					<button
-						class="btn sm:btn-lg variant-ghost-surface"
-						on:click={() => toggleLike(entry)}
-						disabled={!currentUser}
-					>
-						🔥 {entry.likes || 0}
-					</button>
+				<div class="text-left p-0 m-0">
+					{formatDate(entry.date)}
 				</div>
+			</div>
+			<div class="self-end sm:self-auto mt-4 sm:mt-0">
+				<button
+					class="btn sm:btn-lg variant-ghost-surface"
+					on:click={() => toggleLike(entry)}
+					disabled={!currentUser}
+				>
+					🔥 {entry.likes || 0}
+				</button>
 			</div>
 		</div>
-	{/each}
-{/await}
+	</div>
+{/each}
