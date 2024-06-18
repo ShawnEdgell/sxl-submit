@@ -23,11 +23,11 @@
 </script>
 
 <div class="flex justify-center bg-surface-100-800-token w-full">
-	<div class="max-w-2xl w-full flex items-center justify-between p-4">
+	<div class=" w-full flex items-center justify-between p-4">
 		<div class="flex items-center">
 			<LightSwitch />
 		</div>
-		<div>
+		<div class="flex gap-2">
 			<a href="/" class="btn btn-sm variant-ghost" data-sveltekit-preload-data="hover">Home</a>
 			<a href="/archive" class="btn btn-sm variant-ghost" data-sveltekit-preload-data="hover"
 				>Archive</a

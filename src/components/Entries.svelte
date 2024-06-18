@@ -7,28 +7,23 @@
 		getLikesCount
 	} from '../firebase';
 	import type { VideoEntry } from '../firebase';
-	import { onMount, onDestroy } from 'svelte';
-	import { writable, get } from 'svelte/store';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { format } from 'date-fns';
+	import { get } from 'svelte/store';
 	import { user } from '../firebase';
 
 	const entries = writable<VideoEntry[]>([]);
 	let currentUser = get(user);
-	let unsubscribe: () => void;
-	let userUnsubscribe: () => void;
 
 	onMount(() => {
-		unsubscribe = subscribeToVideoEntries((videoEntries: VideoEntry[]) => {
+		const unsubscribe = subscribeToVideoEntries(async (videoEntries: VideoEntry[]) => {
 			entries.set(videoEntries);
 		});
-		userUnsubscribe = user.subscribe((value) => {
+		user.subscribe((value) => {
 			currentUser = value;
 		});
-	});
-
-	onDestroy(() => {
-		if (unsubscribe) unsubscribe();
-		if (userUnsubscribe) userUnsubscribe();
+		return () => unsubscribe();
 	});
 
 	function getYouTubeEmbedUrl(url: string): string | null {
@@ -58,23 +53,19 @@
 		});
 
 		// Perform the actual like/unlike operation
-		try {
-			if (wasLiked) {
-				await unlikePost(entry.id, currentUser.uid);
-			} else {
-				await likePost(entry.id, currentUser.uid);
-			}
-
-			// Ensure the likes count is updated correctly after the operation
-			entry.likes = (await getLikesCount(entry.id)) || 0;
-		} catch (error) {
-			console.error('Error updating likes:', error);
-		} finally {
-			// Update the store again to ensure the correct likes count is displayed
-			entries.update((entries) => {
-				return entries.map((e) => (e.id === entry.id ? { ...entry } : e));
-			});
+		if (wasLiked) {
+			await unlikePost(entry.id, currentUser.uid);
+		} else {
+			await likePost(entry.id, currentUser.uid);
 		}
+
+		// Ensure the likes count is updated correctly after the operation
+		entry.likes = (await getLikesCount(entry.id)) || 0;
+
+		// Update the store again to ensure the correct likes count is displayed
+		entries.update((entries) => {
+			return entries.map((e) => (e.id === entry.id ? { ...entry } : e));
+		});
 	}
 </script>
 
