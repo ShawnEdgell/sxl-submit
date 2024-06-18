@@ -1,12 +1,6 @@
 <script lang="ts">
 	import '../app.postcss';
-	import {
-		initializeStores,
-		Drawer,
-		getDrawerStore,
-		autoModeWatcher,
-		setInitialClassState
-	} from '@skeletonlabs/skeleton';
+	import { initializeStores, autoModeWatcher, setInitialClassState } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 
 	initializeStores();
@@ -16,15 +10,8 @@
 		setInitialClassState();
 	});
 
-	const drawerStore = getDrawerStore();
-
-	function closeDrawer() {
-		drawerStore.close();
-	}
-
 	// Components
 	import AppBar from '../components/AppBar.svelte';
-	import Navigation from '../components/Navigation.svelte';
 	import Footer from '../components/Footer.svelte';
 
 	// Highlight JS
@@ -53,12 +40,10 @@
 	{@html '<script>(' + setInitialClassState.toString() + ')();</script>'}
 </svelte:head>
 
-<Drawer>
-	<Navigation />
-</Drawer>
-
 <div class="flex flex-col min-h-screen items-center">
-	<AppBar />
+	<div class="w-full sticky top-0 z-10 shadow-lg">
+		<AppBar />
+	</div>
 	<!-- Add LightSwitch component here -->
 	<div class="flex-1 w-full max-w-2xl prose dark:prose-dark lg:prose-xl my-4 p-4">
 		<slot />

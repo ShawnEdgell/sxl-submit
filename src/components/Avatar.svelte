@@ -8,7 +8,9 @@
 
 	onMount(() => {
 		user.subscribe((value) => {
+			console.log('User store updated:', value);
 			profileImageUrl = value?.photoURL || '';
+			console.log('Profile Image URL:', profileImageUrl);
 		});
 	});
 </script>

@@ -19,7 +19,6 @@ import {
 	doc,
 	deleteDoc,
 	setDoc,
-	getDoc,
 	increment,
 	updateDoc
 } from 'firebase/firestore';

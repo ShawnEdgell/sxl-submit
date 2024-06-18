@@ -13,7 +13,7 @@ export default {
 	],
 	theme: {
 		extend: {
-			typography: (theme) => ({
+			typography: () => ({
 				DEFAULT: {
 					css: {
 						color: `rgb(var(--theme-font-color-base))`,

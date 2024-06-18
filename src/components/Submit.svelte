@@ -3,18 +3,14 @@
 	import type { User } from 'firebase/auth';
 	import type { VideoEntry } from '../firebase';
 	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
+	import { writable, get } from 'svelte/store';
 
 	const user = writable<User | null>(null);
 	const errorMessage = writable('');
 
 	onMount(() => {
 		const unsubscribe = auth.onAuthStateChanged((authUser) => {
-			if (authUser) {
-				user.set(authUser);
-			} else {
-				user.set(null);
-			}
+			user.set(authUser);
 		});
 		return () => unsubscribe();
 	});
@@ -38,7 +34,7 @@
 			return;
 		}
 
-		const currentUser = $user;
+		const currentUser = get(user);
 		if (currentUser) {
 			const entry: Omit<VideoEntry, 'id'> = {
 				url: videoUrl,

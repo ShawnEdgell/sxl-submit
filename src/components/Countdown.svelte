@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { readable } from 'svelte/store';
 
 	interface TimeLeft {
